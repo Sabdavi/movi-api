@@ -1,6 +1,8 @@
 package com.backbase.controller;
 
+import com.backbase.dto.MovieAwardResponse;
 import com.backbase.service.MovieService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,9 +18,9 @@ public class MovieController {
         this.movieService = movieService;
     }
 
-    @GetMapping
-    public boolean wonBestPicture(@RequestParam() String movieTitle) {
-        return  movieService.wonBestPicture(movieTitle);
-
+    @GetMapping("/won-best-picture")
+    public ResponseEntity<MovieAwardResponse> wonBestPicture(@RequestParam() String movieTitle) {
+        boolean wonBestPicture = movieService.wonBestPicture(movieTitle);
+        return ResponseEntity.ok(new MovieAwardResponse(movieTitle, wonBestPicture))  ;
     }
 }

@@ -13,6 +13,6 @@ public class MovieService {
     }
 
     public boolean wonBestPicture(String movieTitle) {
-        return false;
+        return bestPictureWinnerRepository.existsByTitle(movieTitle);
     }
 }
