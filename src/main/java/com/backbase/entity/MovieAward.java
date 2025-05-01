@@ -12,6 +12,10 @@ public class MovieAward {
     @Column(nullable = false, unique = true)
     private String title;
 
+    public MovieAward(long id) {
+        this.id = id;
+    }
+
     public MovieAward(String title) {
         this.title = title;
     }

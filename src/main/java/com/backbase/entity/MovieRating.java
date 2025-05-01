@@ -21,6 +21,10 @@ public class MovieRating {
     @Column
     private Instant createdAt;
 
+    public MovieRating(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public MovieRating(String title, int rate) {
         this.title = title;
         this.rate = rate;
@@ -39,15 +43,7 @@ public class MovieRating {
         return rate;
     }
 
-    public void setRate(int rate) {
-        this.rate = rate;
-    }
-
     public Instant getCreatedAt() {
         return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
     }
 }

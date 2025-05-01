@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.is;
 
 
 @WebMvcTest(com.backbase.controller.MovieAwardController.class)
-public class MovieAwardController {
+public class MovieAwardControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
