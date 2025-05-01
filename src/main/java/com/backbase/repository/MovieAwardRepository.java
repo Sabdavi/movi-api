@@ -1,8 +1,8 @@
 package com.backbase.repository;
 
-import com.backbase.entity.BestPictureWinner;
+import com.backbase.entity.MovieAward;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface BestPictureWinnerRepository extends JpaRepository<BestPictureWinner, Long> {
+public interface MovieAwardRepository extends JpaRepository<MovieAward, Long> {
     boolean existsByTitle(String title);
 }

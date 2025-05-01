@@ -1,7 +1,6 @@
 package com.backbase;
 
-import com.backbase.controller.MovieController;
-import com.backbase.service.MovieService;
+import com.backbase.service.MovieAwardService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -14,14 +13,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.hamcrest.Matchers.is;
 
 
-@WebMvcTest(MovieController.class)
-public class MovieControllerTest {
+@WebMvcTest(com.backbase.controller.MovieAwardController.class)
+public class MovieAwardController {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private MovieService movieService;
+    private MovieAwardService movieService;
 
 
     @Test

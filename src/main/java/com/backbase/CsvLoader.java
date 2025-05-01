@@ -1,8 +1,7 @@
 package com.backbase;
 
-import com.backbase.dto.BestPictureWinnerDto;
-import com.backbase.entity.BestPictureWinner;
-import com.backbase.repository.BestPictureWinnerRepository;
+import com.backbase.entity.MovieAward;
+import com.backbase.repository.MovieAwardRepository;
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -30,17 +29,17 @@ public class CsvLoader {
     private static final String BEST_PICTURE_CATEGORY_NAME = "Best Picture";
     private static final String BEST_PICTURE_WIN_VALUE = "YES";
 
-    private final BestPictureWinnerRepository awardRepository;
+    private final MovieAwardRepository awardRepository;
 
     @Value("classpath:academy_awards.csv")
     private Resource csvResource;
 
-    public CsvLoader(BestPictureWinnerRepository awardRepository) {
+    public CsvLoader(MovieAwardRepository awardRepository) {
         this.awardRepository = awardRepository;
     }
 
-    private List<BestPictureWinnerDto> readCsv() {
-        List<BestPictureWinnerDto> awardDtos = new ArrayList<>();
+    private List<String> readCsv() {
+        List<String> awardWinningTitles = new ArrayList<>();
         CSVFormat csvFormat = CSVFormat.Builder.create().setHeader().setSkipHeaderRecord(true).setHeader(YEAR_FIELD, CATEGORY_FIELD, NOMINEE_FIELD,ADDITIONAL_INFO_FIELD,WON_FIELD).get();
         try {
             CSVParser parser = CSVParser.parse(csvResource.getInputStream(), StandardCharsets.UTF_8, csvFormat);
@@ -49,38 +48,37 @@ public class CsvLoader {
                String nominee = csvRecord.get(NOMINEE_FIELD);
                String won = csvRecord.get(WON_FIELD);
                if(wonBestPicture(category, won)) {
-                   BestPictureWinnerDto awardDto = new BestPictureWinnerDto(nominee);
-                   awardDtos.add(awardDto);
+                   awardWinningTitles.add(nominee);
                }
             }
         } catch (IOException e) {
-            logger.error("Error accorded in reading academy_awards.csv file", e);
+            logger.error("Error occurred in reading academy_awards.csv file", e);
             throw new RuntimeException(e);
         }
-        return awardDtos;
+        return awardWinningTitles;
     }
 
     private boolean wonBestPicture(String category, String won) {
         return BEST_PICTURE_CATEGORY_NAME.equalsIgnoreCase(category) && BEST_PICTURE_WIN_VALUE.equalsIgnoreCase(won);
     }
 
-    private void saveCsv(List<BestPictureWinnerDto> awardDtos) {
+    private void saveCsv(List<String> awardWinningTitles) {
         List<String> existingAwards = awardRepository
                 .findAll()
                 .stream()
                 .map(award -> award.getTitle().toLowerCase())
                 .toList();
-        List<BestPictureWinner> awards = awardDtos.stream()
-                .filter(award -> ! existingAwards.contains(award.title().toLowerCase()))
-                .map(awardDto -> new BestPictureWinner(awardDto.title()))
+        List<MovieAward> awards = awardWinningTitles.stream()
+                .filter(award -> ! existingAwards.contains(award.toLowerCase()))
+                .map(MovieAward::new)
                 .toList();
         awardRepository.saveAll(awards);
+        logger.info("Number of {} records added to database", awards.size());
     }
 
     @PostConstruct
     void initializeDatabase() {
-        List<BestPictureWinnerDto> awardDtos = readCsv();
-        saveCsv(awardDtos);
-        logger.info("Number of {} records added to database", awardDtos.size());
+        List<String> awardWinningTitles = readCsv();
+        saveCsv(awardWinningTitles);
     }
 }
