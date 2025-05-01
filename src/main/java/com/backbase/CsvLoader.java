@@ -1,6 +1,7 @@
 package com.backbase;
 
 import com.backbase.entity.MovieAward;
+import com.backbase.exception.CsvProcessingException;
 import com.backbase.repository.MovieAwardRepository;
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.csv.CSVFormat;
@@ -52,8 +53,9 @@ public class CsvLoader {
                }
             }
         } catch (IOException e) {
-            logger.error("Error occurred in reading academy_awards.csv file", e);
-            throw new RuntimeException(e);
+            String message = "Error occurred in reading academy_awards.csv file";
+            logger.error(message, e);
+            throw new CsvProcessingException(message, e);
         }
         return awardWinningTitles;
     }
