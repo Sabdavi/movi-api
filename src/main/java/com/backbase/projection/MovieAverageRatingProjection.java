@@ -1,6 +1,6 @@
 package com.backbase.projection;
 
-public interface AverageRatingProjection {
+public interface MovieAverageRatingProjection {
     String getTitle();
     double getAverageRating();
 }

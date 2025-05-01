@@ -1,7 +1,7 @@
 package com.backbase.repository;
 
 import com.backbase.entity.MovieRating;
-import com.backbase.projection.AverageRatingProjection;
+import com.backbase.projection.MovieAverageRatingProjection;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,5 +14,5 @@ public interface MovieRatingRepository extends JpaRepository<MovieRating, Long> 
             "FROM MovieRating r " +
             "GROUP BY r.title " +
             "ORDER BY averageRating DESC")
-    List<AverageRatingProjection> findAverageRatingsByTitle(Pageable pageable);
+    List<MovieAverageRatingProjection> findAverageRatingsByTitle(Pageable pageable);
 }

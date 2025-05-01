@@ -4,7 +4,7 @@ import com.backbase.dto.MovieAverageRating;
 import com.backbase.dto.MovieRatingRequest;
 import com.backbase.dto.MovieRatingResponse;
 import com.backbase.entity.MovieRating;
-import com.backbase.projection.AverageRatingProjection;
+import com.backbase.projection.MovieAverageRatingProjection;
 import com.backbase.service.MovieRatingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +35,7 @@ public class MovieRatingController {
 
     @GetMapping("/top-rated")
     public ResponseEntity<List<MovieAverageRating>> getTop10Rating() {
-        List<AverageRatingProjection> topAverageRatings = movieRatingService.getTop10TopRatedMovies();
+        List<MovieAverageRatingProjection> topAverageRatings = movieRatingService.getTop10TopRatedMovies();
         List<MovieAverageRating> movieAverageRatings = topAverageRatings.stream().map(movieRatingService::toDto).toList();
         return ResponseEntity.ok(movieAverageRatings);
     }
