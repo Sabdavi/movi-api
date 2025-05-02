@@ -7,14 +7,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @WebMvcTest(com.backbase.controller.MovieAwardController.class)
-public class MovieAwardControllerTest {
+class MovieAwardControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -25,7 +26,7 @@ public class MovieAwardControllerTest {
 
     @Test
     void shouldReturnTrueWhenMovieWonBestPicture() throws Exception {
-        String title =  "The King's Speech";
+        String title = "The King's Speech";
         when(movieService.wonBestPicture(title)).thenReturn(true);
         mockMvc.perform(get("/movies/won-best-picture")
                         .param("movieTitle", title))

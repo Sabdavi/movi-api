@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,16 +41,16 @@ public class CsvLoader {
 
     private List<String> readCsv() {
         List<String> awardWinningTitles = new ArrayList<>();
-        CSVFormat csvFormat = CSVFormat.Builder.create().setHeader().setSkipHeaderRecord(true).setHeader(YEAR_FIELD, CATEGORY_FIELD, NOMINEE_FIELD,ADDITIONAL_INFO_FIELD,WON_FIELD).get();
+        CSVFormat csvFormat = CSVFormat.Builder.create().setHeader().setSkipHeaderRecord(true).setHeader(YEAR_FIELD, CATEGORY_FIELD, NOMINEE_FIELD, ADDITIONAL_INFO_FIELD, WON_FIELD).get();
         try {
             CSVParser parser = CSVParser.parse(csvResource.getInputStream(), StandardCharsets.UTF_8, csvFormat);
-            for(CSVRecord csvRecord : parser) {
-               String category = csvRecord.get(CATEGORY_FIELD);
-               String nominee = csvRecord.get(NOMINEE_FIELD);
-               String won = csvRecord.get(WON_FIELD);
-               if(wonBestPicture(category, won)) {
-                   awardWinningTitles.add(nominee);
-               }
+            for (CSVRecord csvRecord : parser) {
+                String category = csvRecord.get(CATEGORY_FIELD);
+                String nominee = csvRecord.get(NOMINEE_FIELD);
+                String won = csvRecord.get(WON_FIELD);
+                if (wonBestPicture(category, won)) {
+                    awardWinningTitles.add(nominee);
+                }
             }
         } catch (IOException e) {
             String message = "Error occurred in reading academy_awards.csv file";
@@ -65,13 +65,9 @@ public class CsvLoader {
     }
 
     private void saveCsv(List<String> awardWinningTitles) {
-        List<String> existingAwards = awardRepository
-                .findAll()
-                .stream()
-                .map(award -> award.getTitle().toLowerCase())
-                .toList();
+        List<String> existingAwards = awardRepository.findAllTitlesLowerCase();
         List<MovieAward> awards = awardWinningTitles.stream()
-                .filter(award -> ! existingAwards.contains(award.toLowerCase()))
+                .filter(award -> !existingAwards.contains(award.toLowerCase()))
                 .map(MovieAward::new)
                 .toList();
         awardRepository.saveAll(awards);

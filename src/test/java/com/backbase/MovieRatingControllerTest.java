@@ -13,12 +13,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @WebMvcTest(com.backbase.controller.MovieRatingController.class)
-public class MovieRatingControllerTest {
+class MovieRatingControllerTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -31,7 +31,7 @@ public class MovieRatingControllerTest {
 
     @Test
     void shouldReturnCorrectRatingResponse() throws Exception {
-        MovieRatingRequest movieRatingRequest = new MovieRatingRequest("The King's Speech",9);
+        MovieRatingRequest movieRatingRequest = new MovieRatingRequest("The King's Speech", 9);
         MovieRating saved = new MovieRating("The King's Speech", 9);
 
         when(movieRatingService.rateMovie(ArgumentMatchers.any())).thenReturn(saved);

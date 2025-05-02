@@ -10,10 +10,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-public class CsvLoaderTest {
+class CsvLoaderTest {
 
     @Autowired
     private CsvLoader csvLoader;
+
     @Test
     void shouldParseBestPictureWinnersFromCsv() throws Exception {
 
