@@ -42,7 +42,7 @@ public class MovieRatingService {
                 .map(projection -> CompletableFuture.supplyAsync(() -> {
                     long movieBoxOffice = movieDataProviderService.getMovieBoxOffice(projection.getTitle());
                     return new MovieAverageRating(projection.getTitle(), projection.getAverageRating(), movieBoxOffice);
-                },executorService)).toList();
+                }, executorService)).toList();
 
         return completableFutures
                 .stream()
