@@ -2,11 +2,14 @@ package com.backbase;
 
 import com.backbase.dto.MovieRatingRequest;
 import com.backbase.entity.MovieRating;
+import com.backbase.security.JwtAuthenticationFilter;
+import com.backbase.security.JwtTokenProvider;
 import com.backbase.service.MovieRatingService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -18,14 +21,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(com.backbase.controller.MovieRatingController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class MovieRatingControllerTest {
 
     @Autowired
     MockMvc mockMvc;
-
     @MockBean
     MovieRatingService movieRatingService;
-
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
     @Autowired
     ObjectMapper objectMapper;
 
@@ -35,6 +41,7 @@ class MovieRatingControllerTest {
         MovieRating saved = new MovieRating("The King's Speech", 9);
 
         when(movieRatingService.rateMovie(ArgumentMatchers.any())).thenReturn(saved);
+        when(movieRatingService.isValidTitle(ArgumentMatchers.any())).thenReturn(true);
 
         mockMvc.perform(post("/movies/rate")
                         .contentType(MediaType.APPLICATION_JSON)
