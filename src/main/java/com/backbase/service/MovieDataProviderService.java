@@ -67,9 +67,12 @@ public class MovieDataProviderService {
     }
 
     private long parseBoxOffice(OmdbMovieResponse response) {
-        if (response == null ||
-                "N/A".equalsIgnoreCase(response.getBoxOffice())) return 0;
+        if (!isValidResponse(response)) return 0;
         String digits = response.getBoxOffice().replaceAll("\\D", "");
         return digits.isBlank() ? 0 : Long.parseLong(digits);
+    }
+
+    private boolean isValidResponse(OmdbMovieResponse response) {
+        return response != null && !"N/A".equalsIgnoreCase(response.getBoxOffice()) && response.isValidResponse();
     }
 }
