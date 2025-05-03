@@ -22,12 +22,3 @@ A user can rate multiple movies, without any restrictions on quantity or frequen
 There are no current constraints such as "only one rating per movie" or "rate only once per day".
 
 This is to allow flexibility in testing and demonstration, and could be extended in the future to enforce stricter rules.
-
-
-3. Movie Title Input
-
-It is assumed that users provide accurate and correctly spelled movie titles when rating movies or querying data.
-
-There is no fuzzy matching, auto-correction, or external validation performed on the title string.
-
-Incorrect or misspelled titles may result in a failure to retrieve box office values or match ratings properly.

@@ -27,6 +27,10 @@ public class MovieRatingController {
         if (!isValidRate(rate)) {
             throw new IllegalArgumentException("Rating must be between 1 and 10.");
         }
+        String title = movieRatingRequest.title();
+        if(!isValidTitle(title)) {
+            throw new IllegalArgumentException("Movie not found!");
+        }
 
         MovieRating movieRating = movieRatingService.rateMovie(movieRatingRequest);
         return ResponseEntity.ok(new MovieRatingResponse(movieRating.getTitle(), movieRating.getRate(), movieRating.getCreatedAt()));
@@ -41,4 +45,8 @@ public class MovieRatingController {
     private boolean isValidRate(int rate) {
         return rate > 0 && rate < 11;
     }
+    private boolean isValidTitle(String title) {
+        return movieRatingService.isValidTitle(title);
+    }
+
 }

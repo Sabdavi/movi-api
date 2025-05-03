@@ -6,8 +6,8 @@ public class OmdbMovieResponse {
 
     @JsonProperty("BoxOffice")
     private String boxOffice;
-
     private boolean response;
+    private String title;
 
     public String getBoxOffice() {
         return boxOffice;
@@ -22,5 +22,13 @@ public class OmdbMovieResponse {
 
     public void setResponse(boolean response) {
         this.response = response;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

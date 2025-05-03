@@ -50,4 +50,8 @@ public class MovieRatingService {
                 .sorted(SORT_BY_AVG_RATING_AND_BOX_OFFICE.reversed())
                 .toList();
     }
+
+    public boolean isValidTitle(String title) {
+        return movieDataProviderService.validateMovieTitle(title);
+    }
 }
