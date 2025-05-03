@@ -1,3 +1,11 @@
+How to run : 
+1. go to the project dir : cd movi-api
+2. run : mvn clean install  docker:build
+3. run :  docker-compose up --build
+
+
+API calls follow :
+
 1. create user :
    curl --location 'http://localhost:8080/auth/users' \
    --header 'Content-Type: application/json' \
