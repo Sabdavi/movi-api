@@ -10,11 +10,13 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class MovieDataProviderService {
     private static final Logger logger = LogManager.getLogger(MovieDataProviderService.class);
     private final RestTemplate restTemplate;
+    private final ConcurrentHashMap<String, Long> movieBoxOfficeCache = new ConcurrentHashMap<>();
 
     @Value("${omdb.api.key}")
     private String apiKey;
@@ -30,6 +32,12 @@ public class MovieDataProviderService {
     }
 
     public long getMovieBoxOffice(String title) {
+
+        Long cachedBoxOffice = movieBoxOfficeCache.get(title);
+        if (cachedBoxOffice != null) {
+            logger.info("Returning cached value for title {}", title);
+            return cachedBoxOffice;
+        }
         URI uri = UriComponentsBuilder.fromHttpUrl(host)
                 .queryParam("t", title)
                 .queryParam("apikey", apiKey)
@@ -40,8 +48,10 @@ public class MovieDataProviderService {
         while (attempt < maxRetries) {
             try {
                 logger.info("Calling BoxOffice API for {}", title);
-                OmdbMovieResponse omdbMovieResponse = restTemplate.getForObject(uri, OmdbMovieResponse.class);
-                return parseBoxOffice(omdbMovieResponse);
+                OmdbMovieResponse response = restTemplate.getForObject(uri, OmdbMovieResponse.class);
+                long parsed = parseBoxOffice(response);
+                movieBoxOfficeCache.put(title, parsed);
+                return parsed;
             } catch (RestClientException e) {
                 logger.warn("BoxOffice API call failed, attempt {} of {}", attempt + 1, maxRetries);
                 attempt++;
