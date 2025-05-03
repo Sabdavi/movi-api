@@ -6,7 +6,9 @@ public class OmdbMovieResponse {
 
     @JsonProperty("BoxOffice")
     private String boxOffice;
+    @JsonProperty("Response")
     private boolean response;
+    @JsonProperty("Title")
     private String title;
 
     public String getBoxOffice() {
