@@ -18,7 +18,7 @@ public class OmdbMovieResponse {
         this.boxOffice = boxOffice;
     }
 
-    public boolean isValidResponse() {
+    public boolean isValid() {
         return response;
     }
 
