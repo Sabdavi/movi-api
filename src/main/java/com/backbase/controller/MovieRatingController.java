@@ -4,6 +4,8 @@ import com.backbase.dto.MovieAverageRating;
 import com.backbase.dto.MovieRatingRequest;
 import com.backbase.dto.MovieRatingResponse;
 import com.backbase.entity.MovieRating;
+import com.backbase.exception.InvalidRatingException;
+import com.backbase.exception.MovieNotFoundException;
 import com.backbase.service.MovieRatingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,11 +31,11 @@ public class MovieRatingController {
 
         int rate = movieRatingRequest.rate();
         if (!isValidRate(rate)) {
-            throw new IllegalArgumentException("Rating must be between 1 and 10.");
+            throw new InvalidRatingException("Rating must be between 1 and 10.");
         }
         String title = movieRatingRequest.title();
         if(!isValidTitle(title)) {
-            throw new IllegalArgumentException("Movie not found!");
+            throw new MovieNotFoundException("Movie not found!");
         }
 
         MovieRating movieRating = movieRatingService.rateMovie(movieRatingRequest);
