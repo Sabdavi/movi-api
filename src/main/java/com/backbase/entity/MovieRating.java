@@ -1,11 +1,19 @@
 package com.backbase.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
 @Entity
-@Table
+@Table(name = "movie_rating")
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class MovieRating {
 
     @Id
@@ -20,30 +28,4 @@ public class MovieRating {
 
     @Column
     private Instant createdAt;
-
-    public MovieRating(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public MovieRating(String title, int rate) {
-        this.title = title;
-        this.rate = rate;
-        this.createdAt = Instant.now();
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public int getRate() {
-        return rate;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
 }

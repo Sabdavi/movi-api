@@ -1,9 +1,17 @@
 package com.backbase.security.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "app_users")
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -15,20 +23,4 @@ public class User {
 
     @Column(nullable = false)
     private String hashedPassword;
-
-    public User() {
-    }
-
-    public User(String username, String hashedPassword) {
-        this.username = username;
-        this.hashedPassword = hashedPassword;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getHashedPassword() {
-        return hashedPassword;
-    }
 }

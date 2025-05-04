@@ -1,4 +1,4 @@
-package com.backbase.security.dto.auth;
+package com.backbase.security.dto;
 
 public record ClientRegistrationResponse(String clientId, String clientSecret) {
 }

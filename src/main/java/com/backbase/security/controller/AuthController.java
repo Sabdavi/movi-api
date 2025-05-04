@@ -1,10 +1,10 @@
 package com.backbase.security.controller;
 
 import com.backbase.security.JwtTokenProvider;
-import com.backbase.security.dto.auth.AuthRequest;
-import com.backbase.security.dto.auth.AuthResponse;
-import com.backbase.security.dto.auth.ClientRegistrationResponse;
-import com.backbase.security.dto.auth.UserRegistrationRequest;
+import com.backbase.security.dto.AuthRequest;
+import com.backbase.security.dto.AuthResponse;
+import com.backbase.security.dto.ClientRegistrationResponse;
+import com.backbase.security.dto.UserRegistrationRequest;
 import com.backbase.security.entity.Client;
 import com.backbase.security.service.ClientService;
 import com.backbase.security.service.UserService;
@@ -56,7 +56,7 @@ public class AuthController {
     @Operation(summary = "Register a new client and receive credentials")
     @PostMapping("/clients")
     public ResponseEntity<ClientRegistrationResponse> registerClient() {
-        Client credentials = clientService.registerClient();
-        return ResponseEntity.ok(new ClientRegistrationResponse(credentials.getClientId(), credentials.getClientSecret()));
+        Client client = clientService.registerClient();
+        return ResponseEntity.ok(new ClientRegistrationResponse(client.getClientId(), client.getClientSecret()));
     }
 }

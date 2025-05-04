@@ -23,8 +23,8 @@ public class UserService {
         if (exists(username)) {
             throw new IllegalArgumentException("Username already taken.");
         }
-        String hashed = encoder.encode(rawPassword);
-        userRepository.save(new User(username, hashed));
+        String hashedPassword = encoder.encode(rawPassword);
+        userRepository.save(User.builder().username(username).hashedPassword(hashedPassword).build());
     }
 
     public boolean isValid(String username, String rawPassword) {

@@ -28,16 +28,6 @@ public class MovieRatingController {
     @Operation(summary = "Rate a movie between 1 and 10")
     @PostMapping("/rate")
     public ResponseEntity<MovieRatingResponse> rateMovie(@RequestBody MovieRatingRequest movieRatingRequest) {
-
-        int rate = movieRatingRequest.rate();
-        if (!isValidRate(rate)) {
-            throw new InvalidRatingException("Rating must be between 1 and 10.");
-        }
-        String title = movieRatingRequest.title();
-        if(!isValidTitle(title)) {
-            throw new MovieNotFoundException("Movie not found!");
-        }
-
         MovieRating movieRating = movieRatingService.rateMovie(movieRatingRequest);
         return ResponseEntity.ok(new MovieRatingResponse(movieRating.getTitle(), movieRating.getRate(), movieRating.getCreatedAt()));
     }
@@ -48,12 +38,4 @@ public class MovieRatingController {
         List<MovieAverageRating> topAverageRatings = movieRatingService.getTop10TopRatedMovies();
         return ResponseEntity.ok(topAverageRatings);
     }
-
-    private boolean isValidRate(int rate) {
-        return rate > 0 && rate < 11;
-    }
-    private boolean isValidTitle(String title) {
-        return movieRatingService.isValidTitle(title);
-    }
-
 }

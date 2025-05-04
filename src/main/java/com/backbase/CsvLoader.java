@@ -68,7 +68,7 @@ public class CsvLoader {
         List<String> existingAwards = awardRepository.findAllTitlesLowerCase();
         List<MovieAward> awards = awardWinningTitles.stream()
                 .filter(award -> !existingAwards.contains(award.toLowerCase()))
-                .map(MovieAward::new)
+                .map(title -> MovieAward.builder().title(title).build())
                 .toList();
         awardRepository.saveAll(awards);
         logger.info("Number of {} records added to database", awards.size());

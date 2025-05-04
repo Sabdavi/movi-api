@@ -18,9 +18,12 @@ public class ClientService {
     public Client registerClient() {
         String clientId = UUID.randomUUID().toString();
         String clientSecret = UUID.randomUUID().toString();
-        Client client = new Client(clientId, clientSecret);
+        Client client = Client.builder()
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .build();
         clientRepository.save(client);
-        return new Client(clientId, clientSecret);
+        return client;
     }
 
     public boolean isValid(String clientId, String clientSecret) {

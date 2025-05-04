@@ -1,4 +1,4 @@
-package com.backbase.security.dto.auth;
+package com.backbase.security.dto;
 
 public record AuthResponse(String accessToken) {
 }

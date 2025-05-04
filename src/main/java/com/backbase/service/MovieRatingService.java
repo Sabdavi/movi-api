@@ -3,11 +3,14 @@ package com.backbase.service;
 import com.backbase.dto.MovieAverageRating;
 import com.backbase.dto.MovieRatingRequest;
 import com.backbase.entity.MovieRating;
+import com.backbase.exception.InvalidRatingException;
+import com.backbase.exception.MovieNotFoundException;
 import com.backbase.projection.MovieAverageRatingProjection;
 import com.backbase.repository.MovieRatingRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -30,7 +33,19 @@ public class MovieRatingService {
     }
 
     public MovieRating rateMovie(MovieRatingRequest movieRatingRequest) {
-        MovieRating movieRating = new MovieRating(movieRatingRequest.title(), movieRatingRequest.rate());
+        int rate = movieRatingRequest.rate();
+        if (!isValidRate(rate)) {
+            throw new InvalidRatingException("Rating must be between 1 and 10.");
+        }
+        String title = movieRatingRequest.title();
+        if(!isValidTitle(title)) {
+            throw new MovieNotFoundException("Movie not found!");
+        }
+        MovieRating movieRating = MovieRating.builder()
+                .title(movieRatingRequest.title())
+                .rate(movieRatingRequest.rate())
+                .createdAt(Instant.now())
+                .build();
         return movieRatingRepository.save(movieRating);
     }
 
@@ -51,7 +66,10 @@ public class MovieRatingService {
                 .toList();
     }
 
-    public boolean isValidTitle(String title) {
+    private boolean isValidRate(int rate) {
+        return rate > 0 && rate < 11;
+    }
+    private boolean isValidTitle(String title) {
         return movieDataProviderService.validateMovieTitle(title);
     }
 }
