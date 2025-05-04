@@ -21,6 +21,6 @@ public class Client {
     @Column(unique = true, nullable = false)
     private String clientId;
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String clientSecret;
 }

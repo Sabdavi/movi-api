@@ -27,7 +27,14 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/token", "/auth/users", "/auth/clients").permitAll()
+                        .requestMatchers("/auth/token",
+                                "/auth/users",
+                                "/auth/clients",
+                                "/h2-console/**",
+                              //  "/movies/rate","/movies/top-rated",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
