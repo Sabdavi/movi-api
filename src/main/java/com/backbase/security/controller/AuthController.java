@@ -8,15 +8,14 @@ import com.backbase.security.dto.auth.UserRegistrationRequest;
 import com.backbase.security.entity.Client;
 import com.backbase.security.service.ClientService;
 import com.backbase.security.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping("/auth")
+@Tag(name = "Authentication", description = "Client and user registration, and token generation")
 public class AuthController {
 
     private final JwtTokenProvider tokenProvider;
@@ -29,6 +28,7 @@ public class AuthController {
         this.clientService = clientService;
     }
 
+    @Operation(summary = "Generate a JWT access token")
     @PostMapping("/token")
     public ResponseEntity<AuthResponse> authenticate(@RequestBody AuthRequest request, @RequestParam String username, @RequestParam String password) {
         boolean isValidClient = clientService.isValid(request.clientId(), request.clientSecret());
@@ -46,12 +46,14 @@ public class AuthController {
         return ResponseEntity.ok(new AuthResponse(token));
     }
 
+    @Operation(summary = "Register a new user")
     @PostMapping("/users")
     public ResponseEntity<String> registerUser(@RequestBody UserRegistrationRequest request) {
         userService.register(request.username(), request.password());
         return ResponseEntity.ok("User registered successfully.");
     }
 
+    @Operation(summary = "Register a new client and receive credentials")
     @PostMapping("/clients")
     public ResponseEntity<ClientRegistrationResponse> registerClient() {
         Client credentials = clientService.registerClient();

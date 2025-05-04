@@ -24,6 +24,7 @@
         <jwt.version>0.11.5</jwt.version>
         <mysql.connector.version>9.3.0</mysql.connector.version>
         <quava.version>33.4.8-jre</quava.version>
+        <springDoc.version>2.3.0</springDoc.version>
         <docker.image.prefix>backbase</docker.image.prefix>
         <docker.registry>docker.io</docker.registry>
     </properties>
@@ -97,6 +98,11 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${quava.version}</version> <!-- Or latest stable -->
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springDoc.version}</version>
         </dependency>
     </dependencies>
     <build>

@@ -2,6 +2,8 @@ package com.backbase.controller;
 
 import com.backbase.dto.MovieAwardResponse;
 import com.backbase.service.MovieAwardService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/movies")
+@Tag(name = "Movie Awards", description = "Endpoints for Oscar Best Picture winners")
 public class MovieAwardController {
 
     private final MovieAwardService movieService;
@@ -18,6 +21,7 @@ public class MovieAwardController {
         this.movieService = movieService;
     }
 
+    @Operation(summary = "Check if a movie won Best Picture")
     @GetMapping("/won-best-picture")
     public ResponseEntity<MovieAwardResponse> wonBestPicture(@RequestParam() String movieTitle) {
         boolean wonBestPicture = movieService.wonBestPicture(movieTitle);
