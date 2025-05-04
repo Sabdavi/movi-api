@@ -2,6 +2,8 @@ package com.backbase.service;
 
 import com.backbase.dto.OmdbMovieResponse;
 import com.backbase.exception.ExternalServiceUnavailableException;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,15 +13,16 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class MovieDataProviderService {
     private static final Logger logger = LogManager.getLogger(MovieDataProviderService.class);
     private static final String NON_AVAILABLE_FIELD = "N/A";
     private final RestTemplate restTemplate;
-    private final ConcurrentHashMap<String, Long> movieBoxOfficeCache = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, Boolean> movieTitleCache = new ConcurrentHashMap<>();
+
+    private final Cache<String, Long> movieBoxOfficeCache;
+    private final Cache<String, Boolean> movieTitleCache;
 
     @Value("${omdb.api.key}")
     private String apiKey;
@@ -30,22 +33,27 @@ public class MovieDataProviderService {
     @Value("${omdb.delay}")
     private long delayMillis;
 
-    public MovieDataProviderService(RestTemplate restTemplate) {
+    public MovieDataProviderService(RestTemplate restTemplate,
+                                    @Value("${cache.maxSize:5000}") int cacheSize,
+                                    @Value("${cache.boxOffice.expireDays:30}") int boxOfficeCacheExpireDays ) {
         this.restTemplate = restTemplate;
+        this.movieBoxOfficeCache =  CacheBuilder.newBuilder()
+                .maximumSize(cacheSize)
+                .expireAfterWrite(boxOfficeCacheExpireDays, TimeUnit.DAYS)
+                .build();
+        this.movieTitleCache =  CacheBuilder.newBuilder()
+                .maximumSize(cacheSize)
+                .build();
     }
 
     public long getMovieBoxOffice(String title) {
 
-        Long cachedBoxOffice = movieBoxOfficeCache.get(title);
+        Long cachedBoxOffice = movieBoxOfficeCache.getIfPresent(title);
         if (cachedBoxOffice != null) {
             logger.info("Returning cached value for title {}", title);
             return cachedBoxOffice;
         }
-        URI uri = UriComponentsBuilder.fromHttpUrl(host)
-                .queryParam("t", title)
-                .queryParam("apikey", apiKey)
-                .build()
-                .toUri();
+        URI uri = generateUri(title, host, apiKey);
 
         int attempt = 0;
         while (attempt < maxRetries) {
@@ -71,7 +79,7 @@ public class MovieDataProviderService {
 
     public boolean validateMovieTitle(String title) {
         String normalizedTitle = title.trim().toLowerCase();
-        Boolean cachedMovieTitle = movieTitleCache.get(normalizedTitle);
+        Boolean cachedMovieTitle = movieTitleCache.getIfPresent(normalizedTitle);
         if (cachedMovieTitle != null) {
             logger.info("Returning cached value for title {}", title);
             return cachedMovieTitle;
