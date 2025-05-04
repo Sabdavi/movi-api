@@ -1,5 +1,6 @@
 package com.backbase.security;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,19 +28,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        String header = request.getHeader("Authorization");
-        if (header != null && header.startsWith("Bearer")) {
-            String token = header.substring(7);
-            if (jwtTokenProvider.validate(token)) {
-                String clientId = jwtTokenProvider.getClientId(token);
+        String token = resolveToken(request);
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(clientId, null, null);
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        if (token != null) {
+            try {
+                Claims claims = jwtTokenProvider.validateToken(token);
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                String username = claims.getSubject();
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(username, null, null);
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+
+            } catch (Exception e) {
+                logger.warn("Invalid JWT token: {}", e);
             }
         }
+
         filterChain.doFilter(request, response);
+    }
+
+    private String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
     }
 }

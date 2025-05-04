@@ -2,7 +2,6 @@ package com.backbase.security.service;
 
 import com.backbase.security.entity.Client;
 import com.backbase.security.repository.ClientRepository;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -11,7 +10,6 @@ import java.util.UUID;
 public class ClientService {
 
     private final ClientRepository clientRepository;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public ClientService(ClientRepository clientRepository) {
         this.clientRepository = clientRepository;
@@ -20,15 +18,18 @@ public class ClientService {
     public Client registerClient() {
         String clientId = UUID.randomUUID().toString();
         String clientSecret = UUID.randomUUID().toString();
-        String hashed = passwordEncoder.encode(clientSecret);
-        Client client = new Client(clientId, hashed);
+        Client client = new Client(clientId, clientSecret);
         clientRepository.save(client);
         return new Client(clientId, clientSecret);
     }
 
-    public boolean isValid(String clientId, String rawSecret) {
+    public boolean isValid(String clientId, String clientSecret) {
         return clientRepository.findByClientId(clientId)
-                .map(client -> passwordEncoder.matches(rawSecret, client.getHashedSecret()))
+                .map(client -> client.getClientSecret().equals(clientSecret))
                 .orElse(false);
+    }
+
+    public String findSecretByClientId(String clientId) {
+        return clientRepository.findClientSecretByClientId(clientId);
     }
 }

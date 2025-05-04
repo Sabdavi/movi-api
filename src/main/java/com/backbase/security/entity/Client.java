@@ -14,21 +14,21 @@ public class Client {
     private String clientId;
 
     @Column(nullable = false)
-    private String hashedSecret;
+    private String clientSecret;
 
     public Client() {
     }
 
-    public Client(String clientId, String hashedSecret) {
+    public Client(String clientId, String clientSecret) {
         this.clientId = clientId;
-        this.hashedSecret = hashedSecret;
+        this.clientSecret = clientSecret;
     }
 
     public String getClientId() {
         return clientId;
     }
 
-    public String getHashedSecret() {
-        return hashedSecret;
+    public String getClientSecret() {
+        return clientSecret;
     }
 }

@@ -42,7 +42,7 @@ public class AuthController {
             throw new SecurityException("User doesn't exist or user name and password  isn't correct");
         }
 
-        String token = tokenProvider.createToken(request.clientId(), username);
+        String token = tokenProvider.createToken(request.clientId(), request.clientSecret(), username);
         return ResponseEntity.ok(new AuthResponse(token));
     }
 
@@ -55,6 +55,6 @@ public class AuthController {
     @PostMapping("/clients")
     public ResponseEntity<ClientRegistrationResponse> registerClient() {
         Client credentials = clientService.registerClient();
-        return ResponseEntity.ok(new ClientRegistrationResponse(credentials.getClientId(), credentials.getHashedSecret()));
+        return ResponseEntity.ok(new ClientRegistrationResponse(credentials.getClientId(), credentials.getClientSecret()));
     }
 }
