@@ -26,6 +26,9 @@
         <quava.version>33.4.8-jre</quava.version>
         <springDoc.version>2.3.0</springDoc.version>
         <lombok.version>1.18.38</lombok.version>
+        <hibenate.validator.version>8.0.2.Final</hibenate.validator.version>
+        <jakarta.validation.version>3.1.0</jakarta.validation.version>
+
         <docker.image.prefix>backbase</docker.image.prefix>
         <docker.registry>docker.io</docker.registry>
     </properties>
@@ -51,6 +54,18 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>${jakarta.validation.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibenate.validator.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

@@ -23,7 +23,7 @@ public class MovieRating {
     @Column(nullable = false)
     private String title;
 
-    @Column
+    @Column(nullable = false)
     private int rate;
 
     @Column

@@ -10,6 +10,7 @@ import com.backbase.security.service.ClientService;
 import com.backbase.security.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +31,7 @@ public class AuthController {
 
     @Operation(summary = "Generate a JWT access token")
     @PostMapping("/token")
-    public ResponseEntity<AuthResponse> authenticate(@RequestBody AuthRequest request, @RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<AuthResponse> authenticate(@Valid @RequestBody AuthRequest request, @RequestParam String username, @RequestParam String password) {
         boolean isValidClient = clientService.isValid(request.clientId(), request.clientSecret());
         boolean isValidUser = userService.isValid(username, password);
 
@@ -48,7 +49,7 @@ public class AuthController {
 
     @Operation(summary = "Register a new user")
     @PostMapping("/users")
-    public ResponseEntity<String> registerUser(@RequestBody UserRegistrationRequest request) {
+    public ResponseEntity<String> registerUser(@Valid @RequestBody UserRegistrationRequest request) {
         userService.register(request.username(), request.password());
         return ResponseEntity.ok("User registered successfully.");
     }

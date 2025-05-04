@@ -33,10 +33,6 @@ public class MovieRatingService {
     }
 
     public MovieRating rateMovie(MovieRatingRequest movieRatingRequest) {
-        int rate = movieRatingRequest.rate();
-        if (!isValidRate(rate)) {
-            throw new InvalidRatingException("Rating must be between 1 and 10.");
-        }
         String title = movieRatingRequest.title();
         if(!isValidTitle(title)) {
             throw new MovieNotFoundException("Movie not found!");
@@ -66,9 +62,6 @@ public class MovieRatingService {
                 .toList();
     }
 
-    private boolean isValidRate(int rate) {
-        return rate > 0 && rate < 11;
-    }
     private boolean isValidTitle(String title) {
         return movieDataProviderService.validateMovieTitle(title);
     }

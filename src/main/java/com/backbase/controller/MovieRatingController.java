@@ -4,12 +4,12 @@ import com.backbase.dto.MovieAverageRating;
 import com.backbase.dto.MovieRatingRequest;
 import com.backbase.dto.MovieRatingResponse;
 import com.backbase.entity.MovieRating;
-import com.backbase.exception.InvalidRatingException;
-import com.backbase.exception.MovieNotFoundException;
 import com.backbase.service.MovieRatingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public class MovieRatingController {
 
     @Operation(summary = "Rate a movie between 1 and 10")
     @PostMapping("/rate")
-    public ResponseEntity<MovieRatingResponse> rateMovie(@RequestBody MovieRatingRequest movieRatingRequest) {
+    public ResponseEntity<MovieRatingResponse> rateMovie(@Valid @RequestBody MovieRatingRequest movieRatingRequest) {
         MovieRating movieRating = movieRatingService.rateMovie(movieRatingRequest);
         return ResponseEntity.ok(new MovieRatingResponse(movieRating.getTitle(), movieRating.getRate(), movieRating.getCreatedAt()));
     }
