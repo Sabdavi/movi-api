@@ -30,10 +30,6 @@ public class MovieDataProviderService {
     private String apiKey;
     @Value("${omdb.host}")
     private String host;
-    @Value("${omdb.max.retries}")
-    private int maxRetries;
-    @Value("${omdb.delay}")
-    private long delayMillis;
 
     public MovieDataProviderService(WebClient webClient,
                                     @Value("${cache.maxSize:5000}") int cacheSize,

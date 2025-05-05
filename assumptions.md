@@ -1,25 +1,13 @@
-Assumptions
+Box office values are fetched from OMDb and cached.
 
-1. Box Office Retrieval Failure
+If box office fetch fails, 0 is returned and used in ordering.
 
-If the OMDb API fails to return a box office value (due to timeout, network issues, or missing data), we assume the
-value to be 0. This fallback is intentional and consistent throughout the system.
+Users can rate multiple movies without restriction.
 
-This assumption directly affects sorting logic for top-rated movies:
+Title matching is case-insensitive and trimmed.
 
-Movies with a failed box office fetch will have boxOffice = 0
+Movie titles must be valid and found on OMDb.
 
-These movies will appear lower in the result list if there is a tie in average rating
+OMDb calls are retried on failure (3 attempts with delay).
 
-We do not retry endlessly or use placeholders beyond 0
-
-This ensures API resilience and avoids blocking behavior or incomplete responses.
-
-2. User Rating Behavior
-
-A user can rate multiple movies, without any restrictions on quantity or frequency.
-
-There are no current constraints such as "only one rating per movie" or "rate only once per day".
-
-This is to allow flexibility in testing and demonstration, and could be extended in the future to enforce stricter
-rules.
+Caching is done in-memory using Guava.

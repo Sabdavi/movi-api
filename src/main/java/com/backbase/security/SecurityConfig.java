@@ -31,7 +31,6 @@ public class SecurityConfig {
                                 "/auth/users",
                                 "/auth/clients",
                                 "/h2-console/**",
-                                "/movies/rate", "/movies/top-rated", "/movies/won-best-picture",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**").permitAll()
