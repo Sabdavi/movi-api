@@ -16,16 +16,16 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Movie Awards", description = "Endpoints for Oscar Best Picture winners")
 public class MovieAwardController {
 
-    private final MovieAwardService movieService;
+    private final MovieAwardService movieAwardService;
 
     public MovieAwardController(MovieAwardService movieService) {
-        this.movieService = movieService;
+        this.movieAwardService = movieService;
     }
 
     @Operation(summary = "Check if a movie won Best Picture")
     @GetMapping("/won-best-picture")
     public ResponseEntity<MovieAwardResponse> wonBestPicture(@RequestParam() @NotBlank(message = "movieTitle must not be blank") String movieTitle) {
-        boolean wonBestPicture = movieService.wonBestPicture(movieTitle);
+        boolean wonBestPicture = movieAwardService.wonBestPicture(movieTitle);
         return ResponseEntity.ok(new MovieAwardResponse(movieTitle, wonBestPicture));
     }
 

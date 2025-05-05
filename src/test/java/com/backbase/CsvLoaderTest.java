@@ -10,6 +10,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.StreamSupport;
@@ -62,12 +63,10 @@ class CsvLoaderTest {
     }
 
     @Test
-    void shouldThrowException_whenCsvIsUnreadable() {
+    void shouldThrowException_whenCsvIsUnreadable() throws IOException {
         Resource faultyResource = mock(Resource.class);
-        try {
-            when(faultyResource.getInputStream()).thenThrow(new RuntimeException("Read failed"));
-        } catch (Exception e) {
-        }
+        when(faultyResource.getInputStream()).thenThrow(new RuntimeException("Read failed"));
+
 
         ReflectionTestUtils.setField(csvLoader, "csvResource", faultyResource);
 
