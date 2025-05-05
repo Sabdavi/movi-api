@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 import java.time.Instant;
 
 @Entity
-@Table(name = "movie_rating")
+@Table(name = "movie_rating", indexes = {
+        @Index(name = "idx_movie_rating_title", columnList = "title")
+})
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,7 +22,7 @@ public class MovieRating {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String title;
 
     @Column(nullable = false)

@@ -7,14 +7,13 @@ import com.google.common.cache.CacheBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
-
-import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -48,6 +47,11 @@ public class MovieDataProviderService {
                 .build();
     }
 
+    @Retryable(
+            retryFor = { WebClientRequestException.class, WebClientResponseException.class },
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 1000)
+    )
     public long getMovieBoxOffice(String title) {
 
         Long cachedBoxOffice = movieBoxOfficeCache.getIfPresent(title);
@@ -57,25 +61,30 @@ public class MovieDataProviderService {
         }
 
         logger.info("Calling BoxOffice API for {}", title);
-        Long boxOffice =  webClient.get()
+        OmdbMovieResponse response = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .queryParam("t", title)
                         .queryParam("apikey", apiKey)
                         .build())
                 .retrieve()
                 .bodyToMono(OmdbMovieResponse.class)
-                .retryWhen(Retry.fixedDelay(maxRetries, Duration.ofMillis(delayMillis))
-                        .filter(this::isRetriable))
-                .map(this::parseBoxOffice)
-                .doOnSuccess(parsed -> movieBoxOfficeCache.put(title, parsed))
-                .onErrorResume(ex -> {
-                    logger.warn("BoxOffice API failed after {} attempts: {}", maxRetries, ex.getMessage());
-                    return Mono.just(0L);
-                })
                 .block();
-        return boxOffice != null ? boxOffice : 0L;
+        long boxOffice = parseBoxOffice(response);
+        movieBoxOfficeCache.put(title, boxOffice);
+        return boxOffice;
     }
 
+    @Recover
+    public long recoverBoxOfficeValidation(Exception ex, String title) {
+        logger.warn("BoxOffice API call failed for '{}' after retries: {}", title, ex.getMessage());
+        return 0L;
+    }
+
+    @Retryable(
+            retryFor = { WebClientRequestException.class, WebClientResponseException.class },
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 1000)
+    )
     public boolean validateMovieTitle(String title) {
         String normalizedTitle = title.trim().toLowerCase();
         Boolean cachedMovieTitle = movieTitleCache.getIfPresent(normalizedTitle);
@@ -85,25 +94,24 @@ public class MovieDataProviderService {
         }
 
         logger.info("Calling title API for {}", title);
-        Boolean isValid = webClient.get()
+        OmdbMovieResponse response = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .queryParam("t", title)
                         .queryParam("apikey", apiKey)
                         .build())
                 .retrieve()
                 .bodyToMono(OmdbMovieResponse.class)
-                .retryWhen(Retry.fixedDelay(maxRetries, Duration.ofMillis(delayMillis))
-                        .filter(this::isRetriable))
-                .map(this::hasValidTitle)
-                .doOnNext(valid -> movieTitleCache.put(normalizedTitle, valid))
-                .onErrorResume(ex -> {
-                    logger.warn("All validation attempts failed for '{}': {}", title, ex.getMessage());
-                    return Mono.error(new ExternalServiceUnavailableException(
-                            "Could not validate movie title at this time. Please try again later."));
-                })
                 .block();
 
-        return isValid != null ? isValid : false;
+        boolean isValid = hasValidTitle(response);
+        movieTitleCache.put(normalizedTitle, isValid);
+        return isValid;
+    }
+
+    @Recover
+    public boolean recoverTitleValidation(Exception ex, String title) {
+        logger.warn("Title validation failed for '{}' after retries: {}", title, ex.getMessage());
+        throw new ExternalServiceUnavailableException("Could not validate movie title at this time. Please try again later.");
     }
 
     private long parseBoxOffice(OmdbMovieResponse response) {
@@ -128,9 +136,5 @@ public class MovieDataProviderService {
 
     private boolean hasData(String field) {
         return field != null && !NON_AVAILABLE_FIELD.equalsIgnoreCase(field);
-    }
-
-    private boolean isRetriable(Throwable ex) {
-        return ex instanceof WebClientRequestException || ex instanceof WebClientResponseException;
     }
 }
