@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -36,19 +37,19 @@ public class MovieDataProviderService {
 
     public MovieDataProviderService(WebClient webClient,
                                     @Value("${cache.maxSize:5000}") int cacheSize,
-                                    @Value("${cache.boxOffice.expireDays:30}") int boxOfficeCacheExpireDays ) {
+                                    @Value("${cache.boxOffice.expireDays:30}") int boxOfficeCacheExpireDays) {
         this.webClient = webClient;
-        this.movieBoxOfficeCache =  CacheBuilder.newBuilder()
+        this.movieBoxOfficeCache = CacheBuilder.newBuilder()
                 .maximumSize(cacheSize)
                 .expireAfterWrite(boxOfficeCacheExpireDays, TimeUnit.DAYS)
                 .build();
-        this.movieTitleCache =  CacheBuilder.newBuilder()
+        this.movieTitleCache = CacheBuilder.newBuilder()
                 .maximumSize(cacheSize)
                 .build();
     }
 
     @Retryable(
-            retryFor = { WebClientRequestException.class, WebClientResponseException.class },
+            retryFor = {WebClientRequestException.class, WebClientResponseException.class},
             maxAttempts = 3,
             backoff = @Backoff(delay = 1000)
     )
@@ -81,7 +82,7 @@ public class MovieDataProviderService {
     }
 
     @Retryable(
-            retryFor = { WebClientRequestException.class, WebClientResponseException.class },
+            retryFor = {WebClientRequestException.class, WebClientResponseException.class},
             maxAttempts = 3,
             backoff = @Backoff(delay = 1000)
     )

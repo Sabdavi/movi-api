@@ -28,20 +28,19 @@ class MovieRatingControllerTest {
     MockMvc mockMvc;
     @MockBean
     MovieRatingService movieRatingService;
+    @Autowired
+    ObjectMapper objectMapper;
     @MockBean
     private JwtTokenProvider jwtTokenProvider;
     @MockBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
-    @Autowired
-    ObjectMapper objectMapper;
 
     @Test
     void shouldReturnCorrectRatingResponse() throws Exception {
         MovieRatingRequest movieRatingRequest = new MovieRatingRequest("The King's Speech", 9);
-        MovieRating saved = new MovieRating("The King's Speech", 9);
+        MovieRating saved = MovieRating.builder().title("The King's Speech").rate(9).build();
 
         when(movieRatingService.rateMovie(ArgumentMatchers.any())).thenReturn(saved);
-        when(movieRatingService.isValidTitle(ArgumentMatchers.any())).thenReturn(true);
 
         mockMvc.perform(post("/movies/rate")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -59,7 +58,7 @@ class MovieRatingControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Rating must be between 1 and 10."));
+                .andExpect(jsonPath("$.message").value("Rating must be at least 1"));
     }
 
     @Test
@@ -70,6 +69,6 @@ class MovieRatingControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Rating must be between 1 and 10."));
+                .andExpect(jsonPath("$.message").value("Rating must be no more than 10"));
     }
 }

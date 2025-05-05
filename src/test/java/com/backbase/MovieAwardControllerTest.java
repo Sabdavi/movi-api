@@ -11,14 +11,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@WebMvcTest( controllers = com.backbase.controller.MovieAwardController.class)
+@WebMvcTest(controllers = com.backbase.controller.MovieAwardController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class MovieAwardControllerTest {
 
@@ -33,7 +32,6 @@ class MovieAwardControllerTest {
 
     @Test
     void shouldReturnTrueWhenMovieWonBestPicture() throws Exception {
-        when(jwtTokenProvider.validate(any())).thenReturn(true);
         String title = "The King's Speech";
         when(movieService.wonBestPicture(title)).thenReturn(true);
         mockMvc.perform(get("/movies/won-best-picture")

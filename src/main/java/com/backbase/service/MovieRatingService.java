@@ -3,7 +3,6 @@ package com.backbase.service;
 import com.backbase.dto.MovieAverageRating;
 import com.backbase.dto.MovieRatingRequest;
 import com.backbase.entity.MovieRating;
-import com.backbase.exception.InvalidRatingException;
 import com.backbase.exception.MovieNotFoundException;
 import com.backbase.projection.MovieAverageRatingProjection;
 import com.backbase.repository.MovieRatingRepository;
@@ -36,7 +35,7 @@ public class MovieRatingService {
     @Transactional
     public MovieRating rateMovie(MovieRatingRequest movieRatingRequest) {
         String title = movieRatingRequest.title();
-        if(!isValidTitle(title)) {
+        if (!isValidTitle(title)) {
             throw new MovieNotFoundException("Movie not found!");
         }
         MovieRating movieRating = MovieRating.builder()

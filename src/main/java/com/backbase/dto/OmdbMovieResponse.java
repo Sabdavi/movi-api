@@ -14,6 +14,7 @@ public class OmdbMovieResponse {
     public String getBoxOffice() {
         return boxOffice;
     }
+
     public void setBoxOffice(String boxOffice) {
         this.boxOffice = boxOffice;
     }
