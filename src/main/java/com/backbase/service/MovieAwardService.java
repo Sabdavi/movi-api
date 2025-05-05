@@ -2,6 +2,7 @@ package com.backbase.service;
 
 import com.backbase.repository.MovieAwardRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MovieAwardService {
@@ -13,6 +14,7 @@ public class MovieAwardService {
         this.movieAwardRepository = bestPictureWinnerRepository;
     }
 
+    @Transactional(readOnly = true)
     public boolean wonBestPicture(String movieTitle) {
         return movieAwardRepository.existsByTitle(movieTitle);
     }

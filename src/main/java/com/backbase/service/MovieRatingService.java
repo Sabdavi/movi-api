@@ -9,6 +9,7 @@ import com.backbase.projection.MovieAverageRatingProjection;
 import com.backbase.repository.MovieRatingRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Comparator;
@@ -32,6 +33,7 @@ public class MovieRatingService {
         this.executorService = executorService;
     }
 
+    @Transactional
     public MovieRating rateMovie(MovieRatingRequest movieRatingRequest) {
         String title = movieRatingRequest.title();
         if(!isValidTitle(title)) {
@@ -45,6 +47,7 @@ public class MovieRatingService {
         return movieRatingRepository.save(movieRating);
     }
 
+    @Transactional(readOnly = true)
     public List<MovieAverageRating> getTop10TopRatedMovies() {
         PageRequest topTen = PageRequest.of(0, TOP_RESULTS);
         List<MovieAverageRatingProjection> averageRatingsByTitle = movieRatingRepository.findAverageRatingsByTitle(topTen);

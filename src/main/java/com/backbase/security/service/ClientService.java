@@ -3,6 +3,7 @@ package com.backbase.security.service;
 import com.backbase.security.entity.Client;
 import com.backbase.security.repository.ClientRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -15,6 +16,7 @@ public class ClientService {
         this.clientRepository = clientRepository;
     }
 
+    @Transactional
     public Client registerClient() {
         String clientId = UUID.randomUUID().toString();
         String clientSecret = UUID.randomUUID().toString();
@@ -26,12 +28,14 @@ public class ClientService {
         return client;
     }
 
+    @Transactional(readOnly = true)
     public boolean isValid(String clientId, String clientSecret) {
         return clientRepository.findByClientId(clientId)
                 .map(client -> client.getClientSecret().equals(clientSecret))
                 .orElse(false);
     }
 
+    @Transactional(readOnly = true)
     public String findSecretByClientId(String clientId) {
         return clientRepository.findClientSecretByClientId(clientId);
     }
