@@ -1,5 +1,6 @@
 package com.backbase.exception;
 
+import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.time.Instant;
 import java.util.stream.Collectors;
@@ -62,6 +64,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ErrorResponse> handleMissingParam(MissingServletRequestParameterException exception) {
         String message = String.format("Required request parameter '%s' is missing", exception.getParameterName());
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), message, Instant.now());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ErrorResponse> handleHandlerMethodValidation(HandlerMethodValidationException ex) {
+        String message = ex.getAllValidationResults().stream()
+                .flatMap(vr -> vr.getResolvableErrors().stream())
+                .map(MessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.joining("; "));
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), message, Instant.now());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }

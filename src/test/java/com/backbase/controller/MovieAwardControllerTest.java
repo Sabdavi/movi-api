@@ -1,4 +1,4 @@
-package com.backbase;
+package com.backbase.controller;
 
 import com.backbase.security.JwtAuthenticationFilter;
 import com.backbase.security.JwtTokenProvider;
@@ -57,5 +57,13 @@ class MovieAwardControllerTest {
     void shouldReturnBadRequestWhenParamMissing() throws Exception {
         mockMvc.perform(get("/movies/won-best-picture"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenTitleIsBlank() throws Exception {
+        mockMvc.perform(get("/movies/won-best-picture")
+                        .param("movieTitle", "  "))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("movieTitle must not be blank"));
     }
 }

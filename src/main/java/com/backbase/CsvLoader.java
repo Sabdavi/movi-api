@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +40,12 @@ public class CsvLoader {
 
     private List<String> readCsv() {
         List<String> awardWinningTitles = new ArrayList<>();
-        CSVFormat csvFormat = CSVFormat.Builder.create().setHeader().setSkipHeaderRecord(true).setHeader(YEAR_FIELD, CATEGORY_FIELD, NOMINEE_FIELD, ADDITIONAL_INFO_FIELD, WON_FIELD).get();
+        CSVFormat csvFormat = CSVFormat.Builder.
+                create()
+                .setHeader()
+                .setSkipHeaderRecord(true)
+                .setHeader(YEAR_FIELD, CATEGORY_FIELD, NOMINEE_FIELD, ADDITIONAL_INFO_FIELD, WON_FIELD)
+                .get();
         try {
             CSVParser parser = CSVParser.parse(csvResource.getInputStream(), StandardCharsets.UTF_8, csvFormat);
             for (CSVRecord csvRecord : parser) {
@@ -52,7 +56,7 @@ public class CsvLoader {
                     awardWinningTitles.add(nominee);
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             String message = "Error occurred in reading academy_awards.csv file";
             logger.error(message, e);
             throw new CsvProcessingException(message, e);

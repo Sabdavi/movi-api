@@ -1,4 +1,4 @@
-package com.backbase;
+package com.backbase.controller;
 
 import com.backbase.dto.MovieRatingRequest;
 import com.backbase.entity.MovieRating;
@@ -70,5 +70,27 @@ class MovieRatingControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Rating must be no more than 10"));
+    }
+
+    @Test
+    void shouldReturn400WhenTitleIsBlank() throws Exception {
+        MovieRatingRequest request = new MovieRatingRequest("  ", 5);
+        mockMvc.perform(post("/movies/rate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Title must not be blank"));
+    }
+
+    @Test
+    void shouldReturn400WhenTitleTooLong() throws Exception {
+        String longTitle = "A".repeat(300);
+        MovieRatingRequest request = new MovieRatingRequest(longTitle, 8);
+
+        mockMvc.perform(post("/movies/rate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Title must be less than 255 characters"));
     }
 }
