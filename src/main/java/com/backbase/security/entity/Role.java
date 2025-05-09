@@ -10,28 +10,24 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "app_users")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String username;
-
-    @Column(nullable = false)
-    private String hashedPassword;
+    private String name;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "user_role",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
+            name = "role_scope",
+            joinColumns = @JoinColumn(name = "role_id"),
+            inverseJoinColumns = @JoinColumn(name = "scope_id")
     )
-    private Set<Role> roles = new HashSet<>();
+    private Set<Scope> scopes = new HashSet<>();
 }
