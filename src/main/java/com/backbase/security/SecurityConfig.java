@@ -19,13 +19,11 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, CustomAuthenticationEntryPoint customAuthenticationEntryPoint, CustomAccessDeniedHandler customAccessDeniedHandler) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
-        this.customAccessDeniedHandler = customAccessDeniedHandler;
     }
 
     @Bean
