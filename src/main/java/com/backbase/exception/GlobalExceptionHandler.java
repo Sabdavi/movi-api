@@ -4,12 +4,15 @@ import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
+import java.nio.file.AccessDeniedException;
 import java.time.Instant;
 import java.util.stream.Collectors;
 
@@ -66,6 +69,18 @@ public class GlobalExceptionHandler {
         String message = String.format("Required request parameter '%s' is missing", exception.getParameterName());
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), message, Instant.now());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException exception) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), exception.getMessage(), Instant.now());
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAuthorizationDeniedException(AuthorizationDeniedException exception) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN.value(), exception.getMessage(), Instant.now());
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(HandlerMethodValidationException.class)

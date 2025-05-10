@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -35,11 +37,16 @@ public class JwtTokenProvider {
         Date expiry = new Date(now.getTime() + validityInMs);
         Key key = Keys.hmacShaKeyFor(clientSecret.getBytes());
         Client client = clientRepository.findByClientId(clientId).get();
-        String scopes = client.getScopes().stream().map(Scope::getName).collect(Collectors.joining(" "));
+        String allScopes = Optional.ofNullable(client.getScopes())
+                .filter( s -> !s.isEmpty())
+                .map(scopes -> scopes.stream()
+                        .map(Scope::getName)
+                        .collect(Collectors.joining(" ")))
+                .orElse(null);
         return Jwts.builder()
                 .setSubject(username)
                 .claim("ClientId", clientId)
-                .claim("scope",scopes)
+                .claim("scope",allScopes)
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS256)
