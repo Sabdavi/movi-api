@@ -1,0 +1,73 @@
+package com.backbase.security;
+
+import com.backbase.security.entity.Client;
+import com.backbase.security.entity.Scope;
+import com.backbase.security.repository.ClientRepository;
+import com.backbase.security.service.ClientService;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.stereotype.Component;
+
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
+import java.util.Date;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Component
+public class JwtTokenProvider {
+
+    private final ClientService clientService;
+    private final ClientRepository clientRepository;
+    private final long validityInMs;
+
+    public JwtTokenProvider(
+            ClientService clientService, ClientRepository clientRepository,
+            @Value("${security.jwt.expiration-ms:3600000}") long validityInMs
+    ) {
+        this.clientService = clientService;
+        this.clientRepository = clientRepository;
+        this.validityInMs = validityInMs;
+    }
+
+    public String createToken(String clientId, String clientSecret, String username) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + validityInMs);
+        Key key = Keys.hmacShaKeyFor(clientSecret.getBytes());
+        Client client = clientRepository.findByClientId(clientId).orElseThrow( () -> new BadCredentialsException("Client doesn't exist"));
+        String allScopes = Optional.ofNullable(client.getScopes())
+                .filter( s -> !s.isEmpty())
+                .map(scopes -> scopes.stream()
+                        .map(Scope::getName)
+                        .collect(Collectors.joining(" ")))
+                .orElse(null);
+        return Jwts.builder()
+                .setHeaderParam("typ", "JWT")
+                .setSubject(username)
+                .setAudience("movie-api")
+                .claim("ClientId", clientId)
+                .claim("scope",allScopes)
+                .claim("grant_type", "client_credentials")
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public Claims validateToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKeyResolver(new SigningKeyResolverAdapter() {
+                    @Override
+                    public Key resolveSigningKey(JwsHeader header, Claims claims) {
+                        String clientId = claims.get("ClientId", String.class);
+                        String clientSecret = clientService.findSecretByClientId(clientId);
+                        return Keys.hmacShaKeyFor(clientSecret.getBytes(StandardCharsets.UTF_8));
+                    }
+                })
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+}
