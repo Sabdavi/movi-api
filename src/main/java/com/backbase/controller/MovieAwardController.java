@@ -28,6 +28,4 @@ public class MovieAwardController {
         boolean wonBestPicture = movieAwardService.wonBestPicture(movieTitle);
         return ResponseEntity.ok(new MovieAwardResponse(movieTitle, wonBestPicture));
     }
-
-
 }
