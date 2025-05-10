@@ -7,13 +7,13 @@ import com.backbase.security.service.ClientService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -36,7 +36,7 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + validityInMs);
         Key key = Keys.hmacShaKeyFor(clientSecret.getBytes());
-        Client client = clientRepository.findByClientId(clientId).get();
+        Client client = clientRepository.findByClientId(clientId).orElseThrow( () -> new BadCredentialsException("Client doesn't exist"));
         String allScopes = Optional.ofNullable(client.getScopes())
                 .filter( s -> !s.isEmpty())
                 .map(scopes -> scopes.stream()
@@ -44,9 +44,12 @@ public class JwtTokenProvider {
                         .collect(Collectors.joining(" ")))
                 .orElse(null);
         return Jwts.builder()
+                .setHeaderParam("typ", "JWT")
                 .setSubject(username)
+                .setAudience("movie-api")
                 .claim("ClientId", clientId)
                 .claim("scope",allScopes)
+                .claim("grant_type", "client_credentials")
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS256)
